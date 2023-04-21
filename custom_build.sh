@@ -1,0 +1,1 @@
+make lite ninja debug
