@@ -11,6 +11,7 @@
 #include "NOD_socket_search_link.hh"
 
 #include "node_geometry_util.hh"
+#include <iostream>
 
 namespace blender::nodes::node_geo_viewer_cc {
 
@@ -31,7 +32,7 @@ static void node_init(bNodeTree * /*tree*/, bNode *node)
   NodeGeometryViewer *data = MEM_cnew<NodeGeometryViewer>(__func__);
   data->data_type = CD_PROP_FLOAT;
   data->domain = ATTR_DOMAIN_AUTO;
-
+  std::cout<<"this is viewer nodeinitialization\n";
   node->storage = data;
 }
 
@@ -62,6 +63,7 @@ static eNodeSocketDatatype custom_data_type_to_socket_type(const eCustomDataType
       BLI_assert_unreachable();
       return SOCK_FLOAT;
   }
+  std::cout<<"this is viewer node socket type detection\n";
 }
 
 static void node_update(bNodeTree *ntree, bNode *node)
@@ -76,6 +78,7 @@ static void node_update(bNodeTree *ntree, bNode *node)
     }
     nodeSetSocketAvailability(ntree, socket, socket->type == socket_type);
   }
+  std::cout<<"this is viewer node update\n";
 }
 
 static void node_gather_link_searches(GatherLinkSearchOpParams &params)
@@ -122,6 +125,7 @@ static void node_gather_link_searches(GatherLinkSearchOpParams &params)
       set_active_fn(params, node);
     });
   }
+  std::cout<<"this is viewer node node_gather_link_searches\n";
 }
 
 }  // namespace blender::nodes::node_geo_viewer_cc
