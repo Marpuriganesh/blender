@@ -1,1 +1,1 @@
-make lite ninja debug
+make lite ninja debug developer verbose 
