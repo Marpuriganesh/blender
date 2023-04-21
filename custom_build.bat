@@ -1,2 +1,2 @@
-call .\make lite ninja developer debug 2019b
+call .\make lite ninja debug 2019b
 call .\test_run.bat
