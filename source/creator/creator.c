@@ -281,6 +281,7 @@ int main(int argc,
 #endif
 )
 {
+  __debugbreak();
   bContext *C;
 
 #ifndef WITH_PYTHON_MODULE
