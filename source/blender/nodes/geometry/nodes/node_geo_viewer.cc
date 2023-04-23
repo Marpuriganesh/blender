@@ -33,7 +33,6 @@ static void node_init(bNodeTree * /*tree*/, bNode *node)
   data->data_type = CD_PROP_FLOAT;
   data->domain = ATTR_DOMAIN_AUTO;
   std::cout<<"this is viewer node initialization\n";
-  __debugbreak();
   node->storage = data;
 }
 
