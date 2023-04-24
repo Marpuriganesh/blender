@@ -1546,6 +1546,8 @@ static void OVERLAY_object_center(OVERLAY_ExtraCallBuffers *cb,
 
 static void OVERLAY_object_name(Object *ob, int theme_id)
 {
+  std::cout<<"clicked on name\n";
+  __debugbreak();
   DRWTextStore *dt = DRW_text_cache_ensure();
   uchar color[4];
   /* Color Management: Exception here as texts are drawn in sRGB space directly. */
