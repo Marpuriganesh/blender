@@ -1587,7 +1587,11 @@ typedef struct NodeGeometryViewer {
   int8_t data_type;
   /* eAttrDomain. */
   int8_t domain;
-} NodeGeometryViewer;
+  /* switching boolean value */
+  uint8_t boolean;
+  /* padding for byte alignment */
+  char _pad[5];
+}NodeGeometryViewer;
 
 typedef struct NodeGeometryUVUnwrap {
   /* GeometryNodeUVUnwrapMethod. */

@@ -31,6 +31,7 @@ static void node_init(bNodeTree * /*tree*/, bNode *node)
 {
   NodeGeometryViewer *data = MEM_cnew<NodeGeometryViewer>(__func__);
   data->data_type = CD_PROP_FLOAT;
+  data->boolean = CD_PROP_BOOL;
   data->domain = ATTR_DOMAIN_AUTO;
   std::cout<<"this is viewer node initialization\n";
   node->storage = data;
@@ -38,6 +39,8 @@ static void node_init(bNodeTree * /*tree*/, bNode *node)
 
 static void node_layout(uiLayout *layout, bContext * /*C*/, PointerRNA *ptr)
 {
+  uiLayout *col = uiLayoutColumn(layout, true);
+  uiItemR(col, ptr, "boolean", UI_ITEM_R_EXPAND, IFACE_("View Values"), ICON_NONE);
   uiItemR(layout, ptr, "domain", 0, "", ICON_NONE);
 }
 
