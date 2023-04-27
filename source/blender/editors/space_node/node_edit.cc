@@ -1590,7 +1590,6 @@ void NODE_OT_preview_toggle(wmOperatorType *ot)
 
 static int node_deactivate_viewer_exec(bContext *C, wmOperator * /*op*/)
 {
-  __debugbreak();
   SpaceNode &snode = *CTX_wm_space_node(C);
   WorkSpace &workspace = *CTX_wm_workspace(C);
 
