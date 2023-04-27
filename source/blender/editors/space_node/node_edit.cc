@@ -1662,6 +1662,7 @@ void NODE_OT_options_toggle(wmOperatorType *ot)
 
 static int node_socket_toggle_exec(bContext *C, wmOperator * /*op*/)
 {
+  __debugbreak();
   SpaceNode *snode = CTX_wm_space_node(C);
 
   /* Sanity checking (poll callback checks this already). */
