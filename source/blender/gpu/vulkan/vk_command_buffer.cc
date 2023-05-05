@@ -9,6 +9,7 @@
 #include "vk_buffer.hh"
 #include "vk_context.hh"
 #include "vk_framebuffer.hh"
+#include "vk_index_buffer.hh"
 #include "vk_memory.hh"
 #include "vk_pipeline.hh"
 #include "vk_texture.hh"
@@ -103,6 +104,14 @@ void VKCommandBuffer::bind(const uint32_t binding,
   vkCmdBindVertexBuffers(vk_command_buffer_, binding, 1, &vk_vertex_buffer, &offset);
 }
 
+void VKCommandBuffer::bind(const VKIndexBuffer &index_buffer, VkIndexType index_type)
+{
+  validate_framebuffer_exists();
+  ensure_active_framebuffer();
+  VkBuffer vk_buffer = index_buffer.vk_handle();
+  vkCmdBindIndexBuffer(vk_command_buffer_, vk_buffer, 0, index_type);
+}
+
 void VKCommandBuffer::begin_render_pass(const VKFrameBuffer &framebuffer)
 {
   validate_framebuffer_not_exists();
@@ -111,7 +120,7 @@ void VKCommandBuffer::begin_render_pass(const VKFrameBuffer &framebuffer)
 
 void VKCommandBuffer::end_render_pass(const VKFrameBuffer &framebuffer)
 {
-  UNUSED_VARS_NDEBUG(framebuffer)
+  UNUSED_VARS_NDEBUG(framebuffer);
   validate_framebuffer_exists();
   BLI_assert(state.framebuffer_ == &framebuffer);
   ensure_no_active_framebuffer();
@@ -285,7 +294,7 @@ void VKCommandBuffer::submit_encoded_commands()
 }
 
 /* -------------------------------------------------------------------- */
-/** \name Framebuffer/RenderPass state tracking
+/** \name FrameBuffer/RenderPass state tracking
  * \{ */
 
 void VKCommandBuffer::validate_framebuffer_not_exists()

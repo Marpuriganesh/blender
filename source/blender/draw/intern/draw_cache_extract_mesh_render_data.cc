@@ -135,8 +135,8 @@ void mesh_render_data_update_loose_geom(MeshRenderData *mr,
                                         const eMRIterType iter_type,
                                         const eMRDataType data_flag)
 {
-  if ((iter_type & (MR_ITER_LOOSE_EDGE | MR_ITER_LOOSE_VERT)) ||
-      (data_flag & MR_DATA_LOOSE_GEOM)) {
+  if ((iter_type & (MR_ITER_LOOSE_EDGE | MR_ITER_LOOSE_VERT)) || (data_flag & MR_DATA_LOOSE_GEOM))
+  {
     mesh_render_data_loose_geom_ensure(mr, cache);
     mr->loose_edges = cache->loose_geom.edges;
     mr->loose_verts = cache->loose_geom.verts;
@@ -310,6 +310,7 @@ void mesh_render_data_update_looptris(MeshRenderData *mr,
     /* Mesh */
     if ((iter_type & MR_ITER_LOOPTRI) || (data_flag & MR_DATA_LOOPTRI)) {
       mr->looptris = mr->me->looptris();
+      mr->looptri_polys = mr->me->looptri_polys();
     }
   }
   else {
@@ -335,7 +336,7 @@ void mesh_render_data_update_normals(MeshRenderData *mr, const eMRDataType data_
     }
     if (((data_flag & MR_DATA_LOOP_NOR) && is_auto_smooth) || (data_flag & MR_DATA_TAN_LOOP_NOR)) {
       mr->loop_normals.reinitialize(mr->corner_verts.size());
-      short(*clnors)[2] = static_cast<short(*)[2]>(
+      blender::short2 *clnors = static_cast<blender::short2 *>(
           CustomData_get_layer_for_write(&mr->me->ldata, CD_CUSTOMLOOPNORMAL, mr->me->totloop));
       const bool *sharp_edges = static_cast<const bool *>(
           CustomData_get_layer_named(&mr->me->edata, CD_PROP_BOOL, "sharp_edge"));
@@ -464,7 +465,8 @@ MeshRenderData *mesh_render_data_create(Object *object,
      * using the cage mesh with deformed coordinates. */
     if ((is_mode_active && mr->me->runtime->is_original_bmesh &&
          mr->me->runtime->wrapper_type == ME_WRAPPER_TYPE_BMESH) ||
-        (do_uvedit && !do_final)) {
+        (do_uvedit && !do_final))
+    {
       mr->extract_type = MR_EXTRACT_BMESH;
     }
     else {

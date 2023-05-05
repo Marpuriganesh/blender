@@ -1586,8 +1586,7 @@ static int image_file_browse_exec(bContext *C, wmOperator *op)
 
   /* If loading into a tiled texture, ensure that the filename is tokenized. */
   if (ima->source == IMA_SRC_TILED) {
-    char *filename = (char *)BLI_path_basename(filepath);
-    BKE_image_ensure_tile_token(filename);
+    BKE_image_ensure_tile_token(filepath, sizeof(filepath));
   }
 
   PointerRNA imaptr;
@@ -2175,7 +2174,8 @@ static int image_save_invoke(bContext *C, wmOperator *op, const wmEvent *event)
 
   /* Not writable formats or images without a file-path will go to "Save As". */
   if (!BKE_image_has_packedfile(ima) &&
-      (!BKE_image_has_filepath(ima) || !image_file_format_writable(ima, iuser))) {
+      (!BKE_image_has_filepath(ima) || !image_file_format_writable(ima, iuser)))
+  {
     WM_operator_name_call(C, "IMAGE_OT_save_as", WM_OP_INVOKE_DEFAULT, NULL, event);
     return OPERATOR_CANCELLED;
   }
@@ -2206,7 +2206,6 @@ void IMAGE_OT_save(wmOperatorType *ot)
 
 static int image_save_sequence_exec(bContext *C, wmOperator *op)
 {
-  Main *bmain = CTX_data_main(C);
   Image *image = image_from_context(C);
   ImBuf *ibuf, *first_ibuf = NULL;
   int tot = 0;
@@ -2250,7 +2249,7 @@ static int image_save_sequence_exec(bContext *C, wmOperator *op)
   }
 
   /* get a filename for menu */
-  BLI_split_dir_part(first_ibuf->name, di, sizeof(di));
+  BLI_path_split_dir_part(first_ibuf->filepath, di, sizeof(di));
   BKE_reportf(op->reports, RPT_INFO, "%d image(s) will be saved in %s", tot, di);
 
   iter = IMB_moviecacheIter_new(image->cache);
@@ -2258,17 +2257,12 @@ static int image_save_sequence_exec(bContext *C, wmOperator *op)
     ibuf = IMB_moviecacheIter_getImBuf(iter);
 
     if (ibuf != NULL && ibuf->userflags & IB_BITMAPDIRTY) {
-      char name[FILE_MAX];
-      BLI_strncpy(name, ibuf->name, sizeof(name));
-
-      BLI_path_abs(name, BKE_main_blendfile_path(bmain));
-
-      if (0 == IMB_saveiff(ibuf, name, IB_rect | IB_zbuf | IB_zbuffloat)) {
+      if (0 == IMB_saveiff(ibuf, ibuf->filepath, IB_rect | IB_zbuf | IB_zbuffloat)) {
         BKE_reportf(op->reports, RPT_ERROR, "Could not write image: %s", strerror(errno));
         break;
       }
 
-      BKE_reportf(op->reports, RPT_INFO, "Saved %s", ibuf->name);
+      BKE_reportf(op->reports, RPT_INFO, "Saved %s", ibuf->filepath);
       ibuf->userflags &= ~IB_BITMAPDIRTY;
     }
 
@@ -2308,7 +2302,8 @@ static bool image_should_be_saved_when_modified(Image *ima)
 static bool image_should_be_saved(Image *ima, bool *is_format_writable)
 {
   if (BKE_image_is_dirty_writable(ima, is_format_writable) &&
-      ELEM(ima->source, IMA_SRC_FILE, IMA_SRC_GENERATED, IMA_SRC_TILED)) {
+      ELEM(ima->source, IMA_SRC_FILE, IMA_SRC_GENERATED, IMA_SRC_TILED))
+  {
     return image_should_be_saved_when_modified(ima);
   }
   return false;
@@ -3902,7 +3897,8 @@ static int render_border_exec(bContext *C, wmOperator *op)
   /* Drawing a border surrounding the entire camera view switches off border rendering
    * or the border covers no pixels. */
   if ((border.xmin <= 0.0f && border.xmax >= 1.0f && border.ymin <= 0.0f && border.ymax >= 1.0f) ||
-      (border.xmin == border.xmax || border.ymin == border.ymax)) {
+      (border.xmin == border.xmax || border.ymin == border.ymax))
+  {
     scene->r.mode &= ~R_BORDER;
   }
   else {

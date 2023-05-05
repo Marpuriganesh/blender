@@ -711,8 +711,8 @@ static char *rna_def_property_get_func(
     if (prop->type == PROP_INT) {
       IntPropertyRNA *iprop = (IntPropertyRNA *)prop;
       /* Only UI_BTYPE_NUM_SLIDER is implemented and that one can't have a softmin of zero. */
-      if ((iprop->ui_scale_type == PROP_SCALE_LOG) &&
-          (iprop->hardmin <= 0 || iprop->softmin <= 0)) {
+      if ((iprop->ui_scale_type == PROP_SCALE_LOG) && (iprop->hardmin <= 0 || iprop->softmin <= 0))
+      {
         CLOG_ERROR(
             &LOG, "\"%s.%s\", range for log scale <= 0.", srna->identifier, prop->identifier);
         DefRNA.error = true;
@@ -807,7 +807,8 @@ static char *rna_def_property_get_func(
         if (STR_ELEM(manualfunc,
                      "rna_iterator_listbase_get",
                      "rna_iterator_array_get",
-                     "rna_iterator_array_dereference_get")) {
+                     "rna_iterator_array_dereference_get"))
+        {
           fprintf(f,
                   "    return rna_pointer_inherit_refine(&iter->parent, &RNA_%s, %s(iter));\n",
                   (cprop->item_type) ? (const char *)cprop->item_type : "UnknownType",
@@ -1150,11 +1151,6 @@ static char *rna_def_property_set_func(
       }
       else {
         const PropertySubType subtype = prop->subtype;
-        const char *string_copy_func =
-            ELEM(subtype, PROP_FILEPATH, PROP_DIRPATH, PROP_FILENAME, PROP_BYTESTRING) ?
-                "BLI_strncpy" :
-                "BLI_strncpy_utf8";
-
         rna_print_data_get(f, dp);
 
         if (dp->dnapointerlevel == 1) {
@@ -1164,10 +1160,14 @@ static char *rna_def_property_set_func(
           fprintf(f, "    const int length = strlen(value);\n");
           fprintf(f, "    if (length > 0) {\n");
           fprintf(f, "        data->%s = MEM_mallocN(length + 1, __func__);\n", dp->dnaname);
-          fprintf(f, "        %s(data->%s, value, length + 1);\n", string_copy_func, dp->dnaname);
+          fprintf(f, "        memcpy(data->%s, value, length + 1);\n", dp->dnaname);
           fprintf(f, "    } else { data->%s = NULL; }\n", dp->dnaname);
         }
         else {
+          const char *string_copy_func =
+              ELEM(subtype, PROP_FILEPATH, PROP_DIRPATH, PROP_FILENAME, PROP_BYTESTRING) ?
+                  "BLI_strncpy" :
+                  "BLI_strncpy_utf8";
           /* Handle char array properties. */
           if (sprop->maxlength) {
             fprintf(f,
@@ -2048,7 +2048,8 @@ static void rna_def_property_funcs(FILE *f, StructRNA *srna, PropertyDefRNA *dp)
        * array get/next function, we can be sure it is an actual array */
       if (cprop->next && cprop->get) {
         if (STREQ((const char *)cprop->next, "rna_iterator_array_next") &&
-            STREQ((const char *)cprop->get, "rna_iterator_array_get")) {
+            STREQ((const char *)cprop->get, "rna_iterator_array_get"))
+        {
           prop->flag_internal |= PROP_INTERN_RAW_ARRAY;
         }
       }
@@ -2389,7 +2390,8 @@ static void rna_def_property_funcs_header_cpp(FILE *f, StructRNA *srna, Property
       const char *collection_funcs = "DefaultCollectionFunctions";
 
       if (!(dp->prop->flag & PROP_IDPROPERTY || dp->prop->flag_internal & PROP_INTERN_BUILTIN) &&
-          cprop->property.srna) {
+          cprop->property.srna)
+      {
         collection_funcs = (char *)cprop->property.srna;
       }
 
@@ -2987,8 +2989,8 @@ static void rna_def_function_funcs(FILE *f, StructDefRNA *dsrna, FunctionDefRNA 
     else if (type == PROP_POINTER || dparm->prop->arraydimension) {
       ptrstr = "*";
     }
-    else if ((type == PROP_POINTER) && (flag_parameter & PARM_RNAPTR) &&
-             !(flag & PROP_THICK_WRAP)) {
+    else if ((type == PROP_POINTER) && (flag_parameter & PARM_RNAPTR) && !(flag & PROP_THICK_WRAP))
+    {
       ptrstr = "*";
       /* PROP_THICK_WRAP strings are pre-allocated on the ParameterList stack,
        * but type name for string props is already (char *), so leave empty */

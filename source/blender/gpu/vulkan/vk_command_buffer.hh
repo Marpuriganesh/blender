@@ -60,13 +60,13 @@ class VKCommandBuffer : NonCopyable, NonMovable {
    * - minimize command buffers and track render passes.
    * - add custom encoder to also track resource usages.
    *
-   * Currently I expect the custom encoder has to be done eventually. But want to keep post-poning
+   * Currently I expect the custom encoder has to be done eventually. But want to keep postponing
    * the custom encoder for now to collect more use cases it should solve. (first pixel drawn on
    * screen).
    *
    * Some command can also be encoded in another way when encoded as a first command. For example
-   * clearing a framebuffer textures isn't allowed inside a render pass, but clearing the
-   * framebuffer textures via ops is allowed. When clearing a framebuffer texture directly after
+   * clearing a frame-buffer textures isn't allowed inside a render pass, but clearing the
+   * frame-buffer textures via ops is allowed. When clearing a frame-buffer texture directly after
    * beginning a render pass could be re-encoded to do this in the same command.
    *
    * So for now we track the state and temporary switch to another state if the command requires
@@ -118,6 +118,7 @@ class VKCommandBuffer : NonCopyable, NonMovable {
   void stage_transfer(Stage stage_from, Stage stage_to)
   {
     BLI_assert(is_in_stage(stage_from));
+    UNUSED_VARS_NDEBUG(stage_from);
 #if 0
     printf(" *** Transfer stage from %s to %s\n",
            to_string(stage_from).c_str(),
@@ -131,6 +132,7 @@ class VKCommandBuffer : NonCopyable, NonMovable {
   void init(const VkDevice vk_device, const VkQueue vk_queue, VkCommandBuffer vk_command_buffer);
   void begin_recording();
   void end_recording();
+
   void bind(const VKPipeline &vk_pipeline, VkPipelineBindPoint bind_point);
   void bind(const VKDescriptorSet &descriptor_set,
             const VkPipelineLayout vk_pipeline_layout,
@@ -140,6 +142,7 @@ class VKCommandBuffer : NonCopyable, NonMovable {
             const VkDeviceSize offset);
   /* Bind the given buffer as a vertex buffer. */
   void bind(const uint32_t binding, const VkBuffer &vk_vertex_buffer, const VkDeviceSize offset);
+  void bind(const VKIndexBuffer &index_buffer, VkIndexType index_type);
 
   void begin_render_pass(const VKFrameBuffer &framebuffer);
   void end_render_pass(const VKFrameBuffer &framebuffer);
