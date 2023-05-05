@@ -1513,18 +1513,18 @@ static void rna_ImageFormatSettings_color_management_set(PointerRNA *ptr, int va
 
 static int rna_SceneRender_file_ext_length(PointerRNA *ptr)
 {
-  RenderData *rd = (RenderData *)ptr->data;
-  char ext[8];
-  ext[0] = '\0';
-  BKE_image_path_ensure_ext_from_imformat(ext, &rd->im_format);
-  return strlen(ext);
+  const RenderData *rd = (RenderData *)ptr->data;
+  const char *ext_array[BKE_IMAGE_PATH_EXT_MAX];
+  int ext_num = BKE_image_path_ext_from_imformat(&rd->im_format, ext_array);
+  return ext_num ? strlen(ext_array[0]) : 0;
 }
 
-static void rna_SceneRender_file_ext_get(PointerRNA *ptr, char *str)
+static void rna_SceneRender_file_ext_get(PointerRNA *ptr, char *value)
 {
-  RenderData *rd = (RenderData *)ptr->data;
-  str[0] = '\0';
-  BKE_image_path_ensure_ext_from_imformat(str, &rd->im_format);
+  const RenderData *rd = (RenderData *)ptr->data;
+  const char *ext_array[BKE_IMAGE_PATH_EXT_MAX];
+  int ext_num = BKE_image_path_ext_from_imformat(&rd->im_format, ext_array);
+  strcpy(value, ext_num ? ext_array[0] : "");
 }
 
 #  ifdef WITH_FFMPEG
@@ -1939,10 +1939,9 @@ static void object_simplify_update(Object *ob)
   ob->id.tag &= ~LIB_TAG_DOIT;
 
   for (md = ob->modifiers.first; md; md = md->next) {
-    if (ELEM(md->type,
-             eModifierType_Subsurf,
-             eModifierType_Multires,
-             eModifierType_ParticleSystem)) {
+    if (ELEM(
+            md->type, eModifierType_Subsurf, eModifierType_Multires, eModifierType_ParticleSystem))
+    {
       DEG_id_tag_update(&ob->id, ID_RECALC_GEOMETRY);
     }
   }
@@ -2522,7 +2521,7 @@ void rna_ViewLayer_active_lightgroup_index_set(PointerRNA *ptr, int value)
 static void rna_ViewLayerLightgroup_name_get(PointerRNA *ptr, char *value)
 {
   ViewLayerLightgroup *lightgroup = (ViewLayerLightgroup *)ptr->data;
-  BLI_strncpy(value, lightgroup->name, sizeof(lightgroup->name));
+  strcpy(value, lightgroup->name);
 }
 
 static int rna_ViewLayerLightgroup_name_length(PointerRNA *ptr)
@@ -2768,7 +2767,8 @@ static void rna_FFmpegSettings_codec_update(Main *UNUSED(bmain),
             AV_CODEC_ID_H264,
             AV_CODEC_ID_MPEG4,
             AV_CODEC_ID_VP9,
-            AV_CODEC_ID_DNXHD)) {
+            AV_CODEC_ID_DNXHD))
+  {
     /* Constant Rate Factor (CRF) setting is only available for H264,
      * MPEG4 and WEBM/VP9 codecs. So changing encoder quality mode to
      * CBR as CRF is not supported.
@@ -3236,7 +3236,13 @@ static void rna_def_tool_settings(BlenderRNA *brna)
   RNA_def_property_translation_context(prop, BLT_I18NCONTEXT_ID_CURVE_LEGACY);
   RNA_def_property_update(prop, NC_SCENE | ND_TOOLSETTINGS, NULL); /* header redraw */
 
-  prop = RNA_def_property(srna, "proportional_size", PROP_FLOAT, PROP_DISTANCE);
+  prop = RNA_def_property(srna, "proportional_size", PROP_FLOAT, PROP_NONE);
+  RNA_def_property_float_sdna(prop, NULL, "proportional_size");
+  RNA_def_property_ui_text(
+      prop, "Proportional Size", "Display size for proportional editing circle");
+  RNA_def_property_range(prop, 0.00001, 5000.0);
+
+  prop = RNA_def_property(srna, "proportional_distance", PROP_FLOAT, PROP_DISTANCE);
   RNA_def_property_float_sdna(prop, NULL, "proportional_size");
   RNA_def_property_ui_text(
       prop, "Proportional Size", "Display size for proportional editing circle");

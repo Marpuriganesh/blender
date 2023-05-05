@@ -292,9 +292,14 @@ typedef struct Mesh {
   blender::MutableSpan<MDeformVert> deform_verts_for_write();
 
   /**
-   * Cached triangulation of the mesh.
+   * Cached triangulation of mesh faces, depending on the face topology and the vertex positions.
    */
   blender::Span<MLoopTri> looptris() const;
+
+  /**
+   * A map containing the face index that each cached triangle from #Mesh::looptris() came from.
+   */
+  blender::Span<int> looptri_polys() const;
 
   /** Set cached mesh bounds to a known-correct value to avoid their lazy calculation later on. */
   void bounds_set_eager(const blender::Bounds<blender::float3> &bounds);
@@ -321,7 +326,7 @@ typedef struct Mesh {
    */
   void loose_edges_tag_none() const;
   /**
-   * Set the number of verices not connected to edges to zero. Similar to #loose_edges_tag_none().
+   * Set the number of vertices not connected to edges to zero. Similar to #loose_edges_tag_none().
    * There may still be vertices only used by loose edges though.
    *
    * \note If both #loose_edges_tag_none() and #tag_loose_verts_none() are called,

@@ -2834,8 +2834,8 @@ static bool p_chart_symmetry_pins(PChart *chart, PEdge *outer, PVert **pin1, PVe
 
     nextbe = p_boundary_edge_next(be);
 
-    if ((be->vert->flag & PVERT_SPLIT) ||
-        (lastbe->vert->flag & nextbe->vert->flag & PVERT_SPLIT)) {
+    if ((be->vert->flag & PVERT_SPLIT) || (lastbe->vert->flag & nextbe->vert->flag & PVERT_SPLIT))
+    {
       if (!cure) {
         if (be == outer) {
           firste1 = be;
@@ -4131,15 +4131,14 @@ void uv_parametrizer_pack(ParamHandle *handle, float margin, bool do_rotate, boo
     pack_island_vector.append(pack_island);
   }
 
-  float scale[2] = {1.0f, 1.0f};
-  pack_islands(pack_island_vector, params, scale);
+  const float scale = pack_islands(pack_island_vector, params);
 
   for (const int64_t i : pack_island_vector.index_range()) {
     PackIsland *pack_island = pack_island_vector[i];
     PChart *chart = handle->charts[pack_island->caller_index];
 
     float matrix[2][2];
-    pack_island->build_transformation(scale[0], pack_island->angle, matrix);
+    pack_island->build_transformation(scale, pack_island->angle, matrix);
     for (PVert *v = chart->verts; v; v = v->nextlink) {
       blender::geometry::mul_v2_m2_add_v2v2(v->uv, matrix, v->uv, pack_island->pre_translate);
     }

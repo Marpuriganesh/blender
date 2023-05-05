@@ -349,8 +349,8 @@ void ED_object_sculptmode_enter_ex(Main *bmain,
 
   sculpt_init_session(bmain, depsgraph, scene, ob);
 
-  if (!(fabsf(ob->scale[0] - ob->scale[1]) < 1e-4f &&
-        fabsf(ob->scale[1] - ob->scale[2]) < 1e-4f)) {
+  if (!(fabsf(ob->scale[0] - ob->scale[1]) < 1e-4f && fabsf(ob->scale[1] - ob->scale[2]) < 1e-4f))
+  {
     BKE_report(
         reports, RPT_WARNING, "Object has non-uniform scale, sculpting may be unpredictable");
   }
@@ -906,9 +906,12 @@ static int sculpt_mask_by_color_invoke(bContext *C, wmOperator *op, const wmEven
   Depsgraph *depsgraph = CTX_data_depsgraph_pointer(C);
   Object *ob = CTX_data_active_object(C);
   SculptSession *ss = ob->sculpt;
-  View3D *v3d = CTX_wm_view3d(C);
-  if (v3d->shading.type == OB_SOLID) {
-    v3d->shading.color_type = V3D_SHADING_VERTEX_COLOR;
+
+  {
+    View3D *v3d = CTX_wm_view3d(C);
+    if (v3d && v3d->shading.type == OB_SOLID) {
+      v3d->shading.color_type = V3D_SHADING_VERTEX_COLOR;
+    }
   }
 
   /* Color data is not available in multi-resolution or dynamic topology. */
@@ -1397,6 +1400,7 @@ void ED_operatortypes_sculpt(void)
   WM_operatortype_append(SCULPT_OT_set_pivot_position);
   WM_operatortype_append(SCULPT_OT_face_sets_create);
   WM_operatortype_append(SCULPT_OT_face_sets_change_visibility);
+  WM_operatortype_append(SCULPT_OT_face_sets_invert_visibility);
   WM_operatortype_append(SCULPT_OT_face_sets_randomize_colors);
   WM_operatortype_append(SCULPT_OT_face_sets_init);
   WM_operatortype_append(SCULPT_OT_cloth_filter);

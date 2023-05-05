@@ -47,6 +47,10 @@ void BKE_main_free(Main *mainvar)
     BKE_main_free(mainvar->next);
   }
 
+  /* Include this check here as the path may be manipulated after creation. */
+  BLI_assert_msg(!(mainvar->filepath[0] == '/' && mainvar->filepath[1] == '/'),
+                 "'.blend' relative \"//\" must not be used in Main!");
+
   /* also call when reading a file, erase all, etc */
   ListBase *lbarray[INDEX_ID_MAX];
   int a;
@@ -333,7 +337,8 @@ void BKE_main_relations_tag_set(struct Main *bmain,
   GHashIterator *gh_iter;
   for (gh_iter = BLI_ghashIterator_new(bmain->relations->relations_from_pointers);
        !BLI_ghashIterator_done(gh_iter);
-       BLI_ghashIterator_step(gh_iter)) {
+       BLI_ghashIterator_step(gh_iter))
+  {
     MainIDRelationsEntry *entry = BLI_ghashIterator_getValue(gh_iter);
     if (value) {
       entry->tags |= tag;
